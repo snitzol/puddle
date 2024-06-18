@@ -1,0 +1,17 @@
+* {
+    box-sizing: border-box;
+}
+
+body, p {
+    margin: 0;
+    font-family: monospace;
+    color: #ccc;
+    background: #111;
+}
+
+canvas {
+    width: 100%;
+    background: #222;
+    border: 2px solid #333;
+    image-rendering: pixelated;
+}
