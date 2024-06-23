@@ -25,7 +25,8 @@ function taskComponent() {
                         this.task.step = 'harvesting';
                     }
 
-                    this.hitbox.update(this.x, this.y);
+                    this.hitbox.x = this.x - 16;
+                    this.hitbox.y = this.y - 16;
                     break;
                 case 'harvesting':
                     this.task.cooldown -= 1;
@@ -87,7 +88,8 @@ function moveComponent() {
             this.x = x;
             this.y = y;
 
-            this.hitbox.update(x, y);
+            this.hitbox.x = this.x - 16;
+            this.hitbox.y = this.y - 16;
         },
     }
 }
@@ -98,59 +100,23 @@ function inventoryComponent() {
     }
 }
 
-class Rectangle {
-    constructor(x, y, width = 32, height = 32) {
-        this.x = x - width / 2;
-        this.y = y - height / 2;
-        this.width = width;
-        this.height = height;
-    }
-
-    update(x, y) {
-        if (this.radius) {
-            this.x = x;
-            this.y = y;
-        } else {
-            this.x = x - this.width / 2;
-            this.y = y - this.height / 2;
-        }
-    }
-
-    render(ctx) {
-        ctx.strokeStyle = 'red';
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
-    }
-
-    intersect(point) {
-        const { x: x, y: y, width: width, height: height } = this;
-        return (
-            point.x + point.width >= x &&
-            point.x <= x + width &&
-            point.y + point.height >= y &&
-            point.y <= y + height
-        );
-    }
-}
-
-class Circle {
-    constructor(x, y, radius = 32) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-    }
-}
-
 function createNitwit(x, y) {
     const base = {
         type: 'nitwit',
         id: 'nitwit_' + x + ',' + y,
         x: x,
         y: y,
-        hitbox: new Rectangle(x, y),
+        width: 1,
+        height: 1,
+        hitbox: new Rectangle(
+            x - 16 * 1,
+            y - 16 * 1,
+            1 * 32,
+            1 * 32,
+        ),
         color: 'wheat',
-        sprite: new Image(),
+        sprite: sprites['nitwit'],
     };
-    base.sprite.src = 'i/nitwit.png';
 
     return {
         ...base,
@@ -167,11 +133,17 @@ function createCrate(x, y) {
         id: 'crate_' + x + ',' + y,
         x: x,
         y: y,
-        hitbox: new Rectangle(x, y),
+        width: 1,
+        height: 1,
+        hitbox: new Rectangle(
+            x - 16 * 1,
+            y - 16 * 1,
+            1 * 32,
+            1 * 32,
+        ),
         color: 'saddlebrown',
-        sprite: new Image(),
+        sprite: sprites['crate'],
     };
-    base.sprite.src = 'i/crate.png';
 
     return {
         ...base,
@@ -186,11 +158,17 @@ function createTree(x, y) {
         id: 'tree_' + x + ',' + y,
         x: x,
         y: y,
-        hitbox: new Rectangle(x, y),
+        width: 2,
+        height: 2,
+        hitbox: new Rectangle(
+            x - 16 * 2,
+            y - 16 * 2,
+            2 * 32,
+            2 * 32,
+        ),
         color: 'yellowgreen',
-        sprite: new Image(),
+        sprite: sprites['tree'],
     };
-    base.sprite.src = 'i/tree.png';
     return {
         ...base,
         ...renderComponent(),

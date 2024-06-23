@@ -3,15 +3,18 @@
 }
 
 body, p {
+    overflow: hidden;
     margin: 0;
     font-family: monospace;
-    color: #ccc;
-    background: #111;
 }
 
 canvas {
-    width: 100%;
     background: #222;
-    border: 2px solid #333;
     image-rendering: pixelated;
+}
+
+#hud {
+    position: fixed;
+    top: 0;
+    color: #eee;
 }

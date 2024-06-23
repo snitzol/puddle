@@ -3,7 +3,7 @@ class Game {
         this.updateInterval = null;
         this.canvas = document.createElement('canvas');
         this.canvas.width = window.innerWidth;
-        this.canvas.height = 500;
+        this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.imageSmoothingEnabled = false;
         document.body.prepend(this.canvas);
@@ -17,6 +17,7 @@ class Game {
         window.addEventListener('wheel', handleMouseWheel)
         window.addEventListener('keydown', handlekeyDown);
         window.addEventListener('keyup', handlekeyUp);
+        window.addEventListener('resize', resizeCanvas);
 
         this.camera = {
             x: 0,
@@ -37,14 +38,16 @@ class Game {
             if (entity.task && entity.task.target !== null) {
                 entity.update();
             }
-        })
+        });
     }
 
     render = () => {
         const ctx = this.ctx;
         let offset = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.save();
+
         ctx.translate(offset.x, offset.y);
         ctx.scale(this.camera.zoom, this.camera.zoom);
         ctx.translate(-this.camera.x, -this.camera.y);
@@ -53,6 +56,7 @@ class Game {
 
         this.entities.forEach((entity) => {
             entity.render(ctx);
+            entity.hitbox.render(ctx);
         })
 
         if (player.selectedEntity) {

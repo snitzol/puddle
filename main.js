@@ -8,6 +8,37 @@
 
 */
 
+class Rectangle {
+    constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    render(ctx) {
+        ctx.strokeStyle = 'red';
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
+
+    intersect(rect) {
+        return (
+            this.x + this.width  >= rect.x &&
+            this.x               <= rect.x + rect.width &&
+            this.y + this.height >= rect.y &&
+            this.y               <= rect.y + rect.height
+        );
+    }
+}
+
+class Circle {
+    constructor(x, y, radius = 32) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+    }
+}
+
 const player = {
     selectedEntity: null,
 };
@@ -100,17 +131,19 @@ function getHoveredEntity() {
 }
 
 function handleMouseWheel(e) {
+    const maxZoom = 250;
+    const minZoom = 50;
     // move decimal place to avoid floating point inaccuracy
-    let newZoomLevel = game.camera.zoom * 10;
+    let newZoomLevel = game.camera.zoom * 100;
 
     if (e.deltaY < 0) { // zoom in
-        if (newZoomLevel >= 25) { return; }
-        newZoomLevel += 1;
+        if (newZoomLevel >= maxZoom) { return; }
+        newZoomLevel += 10;
     } else { // zoom out
-        if (newZoomLevel <= 5) { return; }
-        newZoomLevel -= 1;
+        if (newZoomLevel <= minZoom) { return; }
+        newZoomLevel -= 10;
     }
-    game.camera.zoom = newZoomLevel / 10;
+    game.camera.zoom = newZoomLevel / 100;
 }
 
 let keys = {};
@@ -127,20 +160,74 @@ function processInput() {
     if (keys['a']) { game.camera.x -= speed; mouse.x -= speed;}
     if (keys['s']) { game.camera.y += speed; mouse.y += speed;}
     if (keys['d']) { game.camera.x += speed; mouse.x += speed;}
+
     mouse.element.textContent = mouse.x + ',' + mouse.y;
 }
 
-const game = new Game();
-game.start();
+function resizeCanvas() {
+    game.canvas.width = window.innerWidth;
+    game.canvas.height = window.innerHeight;
+    game.ctx.imageSmoothingEnabled = false;
+}
 
-let nitwit = createNitwit(0, 0);
-let tree = createTree(256, 64);
-let crate = createCrate(126, -32);
-game.entities.add(nitwit);
-game.entities.add(tree);
-game.entities.add(crate);
+let sprites = {};
+let spritePaths = [
+    'nitwit',
+    'tree',
+    'crate',
+    'grass_0',
+]
 
-game.world.generateChunk(-1, -1);
-game.world.generateChunk(0, -1);
-game.world.generateChunk(-1, 0);
-game.world.generateChunk(0, 0);
+function loadSprites(callback) {
+    let loaded = 0;
+
+    spritePaths.forEach((id) => {
+        const url = 'i/' + id + '.png';
+        const image = new Image();
+        image.onload = function() {
+            loaded++;
+            sprites[id] = image;
+            if (loaded === spritePaths.length) {
+                callback();
+            }
+        };
+        image.src = url;
+    });
+}
+
+loadSprites(function() {
+    window.game = new Game();
+    game.start();
+
+    window.nitwit = createNitwit(16, 16);
+    window.tree = createTree(256, 96);
+    window.crate = createCrate(80, -142);
+    game.entities.add(nitwit);
+    game.entities.add(tree);
+    game.entities.add(crate);
+
+    // center chunks
+    game.world.generateChunk(-1, -1);
+    game.world.generateChunk(0, -1);
+    game.world.generateChunk(-1, 0);
+    game.world.generateChunk(0, 0);
+
+    // additional top
+    game.world.generateChunk(-2, -2);
+    game.world.generateChunk(-1, -2);
+    game.world.generateChunk(0, -2);
+    game.world.generateChunk(1, -2);
+
+    // additional sides
+    game.world.generateChunk(-2, -1);
+    game.world.generateChunk(-2, 0);
+    game.world.generateChunk(1, -1);
+    game.world.generateChunk(1, 0);
+
+    // additional bottom
+    game.world.generateChunk(-2, 1);
+    game.world.generateChunk(-1, 1);
+    game.world.generateChunk(0, 1);
+    game.world.generateChunk(1, 1);
+});
+
