@@ -138,8 +138,9 @@ class Input {
     }
 
     handleResize = (e) => {
-        this.game.canvas.width = window.innerWidth;
-        this.game.canvas.height = window.innerHeight;
-        this.game.ctx.imageSmoothingEnabled = false;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        let ctx = this.canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
     }
 }
