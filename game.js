@@ -8,17 +8,6 @@ class Game {
         this.ctx.imageSmoothingEnabled = false;
         document.body.prepend(this.canvas);
 
-        this.canvas.addEventListener("contextmenu", (e) => {e.preventDefault()});
-        this.canvas.addEventListener('mousemove', handleMouseMoveInput);
-        this.canvas.addEventListener('mouseout', handleMouseOutInput);
-        this.canvas.addEventListener('mousedown', handleMouseDownInput);
-        this.canvas.addEventListener('mouseup', handleMouseUpInput);
-        this.canvas.addEventListener('click', handleMouseInput);
-        window.addEventListener('wheel', handleMouseWheel)
-        window.addEventListener('keydown', handlekeyDown);
-        window.addEventListener('keyup', handlekeyUp);
-        window.addEventListener('resize', resizeCanvas);
-
         this.camera = {
             x: 0,
             y: 0,
@@ -28,11 +17,12 @@ class Game {
 
         this.world = new World();
         this.entities = new Set();
+
+        this.input = new Input(this);
     }
 
     update = () => {
-        //console.log('update tick');
-        processInput();
+        this.input.updateCamera();
 
         this.entities.forEach((entity) => {
             if (entity.task && entity.task.target !== null) {

@@ -6,6 +6,8 @@ body, p {
     overflow: hidden;
     margin: 0;
     font-family: monospace;
+    font-size: 12px;
+    line-height: 8px;
 }
 
 canvas {
@@ -15,6 +17,7 @@ canvas {
 
 #hud {
     position: fixed;
+    margin: 4px;
     top: 0;
     color: #eee;
 }

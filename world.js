@@ -18,7 +18,7 @@ class World {
         let found = this.region.query(range);
 
         found.forEach((chunk) => {
-            if (!chunk.canvas) { this.cacheChunk(chunk); }
+            if (!chunk.canvas) { chunk.cache(this.tileSize); }
             ctx.drawImage(chunk.canvas, chunk.boundary.x, chunk.boundary.y, chunk.boundary.width, chunk.boundary.height)
         });
 
@@ -28,72 +28,41 @@ class World {
         this.region.render(ctx);
     }
 
-    cacheChunk(chunk) {
-        const canvas = document.createElement('canvas');
-        canvas.width = this.tileSize * this.chunkSize;
-        canvas.height = this.tileSize * this.chunkSize;
-        const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
+    getHovering(mouse) {
+        const range = new Rectangle(mouse.x, mouse.y, 1, 1);
 
-        let tile = null;
+        const found = this.region.query(range);
+        if (found.size === 0) { return; }
+        const chunk = Array.from(found)[0];
 
-        for (let y = 0; y < this.chunkSize; y++) {
-            if (chunk.tileData[y] === undefined) {
-                console.log('error', chunk, 'y: ' + y);
-                continue;
+        let hovering = false;
+
+        chunk.entities.forEach((entity) => {
+            if (entity.hitbox.intersect(range)) {
+                hovering = entity;
             }
- 
-            for (let x = 0; x < this.chunkSize; x++) {
-                if (chunk.tileData[y][x] === undefined) {
-                    console.log('error', chunk, 'x: ' + x);
-                    continue;
-                }
+        });
 
-                if (chunk.tileData[y][x] === 1) {
-                    ctx.fillStyle = "#111";
-                    tile = 'grass_0';
-                } else {
-                    ctx.fillStyle = "#000";
-                    tile = 'grass_0';
-                }
-
-                if (tile) {
-                    ctx.drawImage(sprites[tile], x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
-                } else {
-                    ctx.fillRect(x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
-                }
-                
-            }
-        }
-
-        chunk.canvas = canvas;
-        //chunk.image = new Image();
-        //chunk.image.src = canvas.toDataURL();
+        return hovering;
     }
 
     generateChunk(x, y) {
-        const chunk = {
-            id: 'chunk.' + x + '.' + y,
-            x: x,
-            y: y,
-            boundary: new Rectangle(
-                x * this.tileSize * this.chunkSize,
-                y * this.tileSize * this.chunkSize,
-                this.tileSize * this.chunkSize,
-                this.tileSize * this.chunkSize,
-            ),
-            tileData: [
-                [0,1,0,1,0,1,0,1],
-                [1,0,1,0,1,0,1,0],
-                [0,1,0,1,0,1,0,1],
-                [1,0,1,0,1,0,1,0],
-                [0,1,0,1,0,1,0,1],
-                [1,0,1,0,1,0,1,0],
-                [0,1,0,1,0,1,0,1],
-                [1,0,1,0,1,0,1,0],
-            ],
-        };
+        const tileData = [
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+            [2,2,2,2,2,2,2,2],
+        ];
+
+        const chunk = new Chunk(x, y, this.tileSize, this.chunkSize, tileData);
+
+        chunk.cache(this.tileSize);
+
         this.region.insert(chunk);
-        this.cacheChunk(chunk);
+        window.chunks.push(chunk);
     }
 }
